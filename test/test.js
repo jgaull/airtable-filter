@@ -12,20 +12,12 @@ describe('AirtableQuery', function () {
 
 	var AirtableQuery = require('../index')
 	var base = Airtable.base('appx65wZlf4173yqx')
-	var query
-
-	beforeEach(function () {
-		query = new AirtableQuery(base('Pokemon'))
-	})
-
-	afterEach(function () {
-		query = null
-	})
 
 	it('supports containedIn', function (done) {
 
 		var ids = ['2', '101', '1']
 
+		var query = new AirtableQuery(base('Pokemon'))
 		query.containedIn("id", ids)
 		query.firstPage().then(function(records) {
 
@@ -46,6 +38,8 @@ describe('AirtableQuery', function () {
 	it('supports containedIn list of RECORD_ID()s', function (done) {
 
 		var recordIds = ['rec26TzCrvUuZvKLC', 'recZjsPlLtKAwgK4I', 'reczBVQyj0iGlPNO5']
+
+		var query = new AirtableQuery(base('Pokemon'))
 		query.containedIn(recordIds)
 		query.all().then(function (records) {
 
@@ -67,6 +61,7 @@ describe('AirtableQuery', function () {
 
 		var name = 'snorlax'
 
+		var query = new AirtableQuery(base('Pokemon'))
 		query.equalTo('identifier', name)
 		query.firstPage().then(function (records) {
 
@@ -86,6 +81,7 @@ describe('AirtableQuery', function () {
 
 	it('supports equalTo RECORD_ID()', function (done) {
 
+		var query = new AirtableQuery(base('Pokemon'))
 		query.equalTo('rec26TzCrvUuZvKLC')
 		query.firstPage().then(function (records) {
 
@@ -128,6 +124,106 @@ describe('AirtableQuery', function () {
 				done(e)
 			}
 
+		}, function (error) {
+			done(error)
+		})
+	})
+
+	it('supports greaterThan', function (done) {
+
+		var height = 25
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.greaterThan('height', height)
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 39)
+
+				records.forEach(function (record) {
+					assert(record.get('height') > height)
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		}, function (error) {
+			done(error)
+		})
+	})
+
+	it('supports greaterThanOrEqualTo', function (done) {
+
+		var height = 25
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.greaterThanOrEqualTo('height', height)
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 47)
+
+				records.forEach(function (record) {
+					assert(record.get('height') >= height)
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		}, function (error) {
+			done(error)
+		})
+	})
+
+	it('supports lessThan', function (done) {
+
+		var height = 3
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.lessThan('height', height)
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 16)
+
+				records.forEach(function (record) {
+					assert(record.get('height') < height)
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		}, function (error) {
+			done(error)
+		})
+	})
+
+	it('supports lessThanOrEqualTo', function (done) {
+
+		var height = 2
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.lessThanOrEqualTo('height', height)
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 16)
+
+				records.forEach(function (record) {
+					assert(record.get('height') <= height)
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
 		}, function (error) {
 			done(error)
 		})

@@ -46,10 +46,10 @@ Query.prototype.all = function(params) {
 	})
 }
 
-Query.prototype.each = function(params, callback) {
+Query.prototype.each = function(params, eachCallback) {
 
 	if (typeof params === 'function') {
-		callback = params
+		eachCallback = params
 		params = null
 	}
 
@@ -60,7 +60,7 @@ Query.prototype.each = function(params, callback) {
 			select.eachPage(function (records, next) {
 
 				records.forEach(function(record) {
-					callback(record)
+					eachCallback(record)
 			    })
 
 			    next()
@@ -98,10 +98,31 @@ Query.prototype.equalTo = function(key, value) {
 		key = 'RECORD_ID()'
 	}
 
+	return this.compare(key, value, equal)
+}
+
+Query.prototype.greaterThan = function (key, value) {
+	return this.compare(key, value, greaterThan)
+}
+
+Query.prototype.greaterThanOrEqualTo = function (key, value) {
+	return this.compare(key, value, greaterThanOrEqualTo)
+}
+
+Query.prototype.lessThan = function (key, value) {
+	return this.compare(key, value, lessThan)
+}
+
+Query.prototype.lessThanOrEqualTo = function (key, value) {
+	return this.compare(key, value, lessThanOrEqualTo)
+}
+
+Query.prototype.compare = function(key, value, operation) {
+
 	key = sanitizeKey(key)
 	value = sanitizeValue(value)
 
-	this.constraints.push(equal(key, value))
+	this.constraints.push(operation(key, value))
 	return this
 }
 
@@ -166,7 +187,31 @@ function logical(name, args) {
 }
 
 function equal(val1, val2) {
-	return val1 + '=' + val2
+	return logicalOperator(val1, '=', val2)
+}
+
+function notEqual(val1, val2) {
+	return logicalOperator(val1, '!=', val2)
+}
+
+function greaterThan(val1, val2) {
+	return logicalOperator(val1, '>', val2)
+}
+
+function greaterThanOrEqualTo(val1, val2) {
+	return logicalOperator(val1, '>=', val2)
+}
+
+function lessThan(val1, val2) {
+	return logicalOperator(val1, '<', val2)
+}
+
+function lessThanOrEqualTo(val1, val2) {
+	return logicalOperator(val1, '<=', val2)
+}
+
+function logicalOperator(val1, operator, val2) {
+	return val1 + operator + val2
 }
 
 function buildFunction(name, args) {
