@@ -114,6 +114,16 @@ Query.prototype.equalTo = function(key, value) {
 	return this.addCondition(equal(sanitizeKey(key), sanitizeValue(value)))
 }
 
+Query.prototype.notEqualTo = function (key, value) {
+
+	if (isRecordId(key) && !value) {
+		value = key
+		key = 'RECORD_ID()'
+	}
+
+	return this.addCondition(not(equal(sanitizeKey(key), sanitizeValue(value))))
+}
+
 Query.prototype.greaterThan = function (key, value) {
 	return this.addCondition(greaterThan(sanitizeKey(key), sanitizeValue(value)))
 }
@@ -317,6 +327,10 @@ function sanitizeValue(value) {
 
 	if (value === false) {
 		return 'FALSE()'
+	}
+
+	if (value === null) {
+		return 'BLANK()'
 	}
 
 	if (typeof value == 'string' && !isFunction(value)) {
