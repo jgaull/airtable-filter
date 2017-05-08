@@ -120,7 +120,7 @@ describe('AirtableQuery', function () {
 		})
 	})
 
-	it('suports isError', function (done) {
+	it('supports isError', function (done) {
 
 		var query = new AirtableQuery(base('Pokemon'))
 		query.isError('Error')
