@@ -110,31 +110,23 @@ Query.prototype.equalTo = function(key, value) {
 		key = 'RECORD_ID()'
 	}
 
-	return this.addComparator(key, value, equal)
+	return this.addCondition(equal(sanitizeKey(key), sanitizeValue(value)))
 }
 
 Query.prototype.greaterThan = function (key, value) {
-	return this.addComparator(key, value, greaterThan)
+	return this.addCondition(greaterThan(sanitizeKey(key), sanitizeValue(value)))
 }
 
 Query.prototype.greaterThanOrEqualTo = function (key, value) {
-	return this.addComparator(key, value, greaterThanOrEqualTo)
+	return this.addCondition(greaterThanOrEqualTo(sanitizeKey(key), sanitizeValue(value)))
 }
 
 Query.prototype.lessThan = function (key, value) {
-	return this.addComparator(key, value, lessThan)
+	return this.addCondition(lessThan(sanitizeKey(key), sanitizeValue(value)))
 }
 
 Query.prototype.lessThanOrEqualTo = function (key, value) {
-	return this.addComparator(key, value, lessThanOrEqualTo)
-}
-
-Query.prototype.addComparator = function(key, value, operation) {
-
-	key = sanitizeKey(key)
-	value = sanitizeValue(value)
-
-	return this.addCondition(operation(key, value))
+	return this.addCondition(lessThanOrEqualTo(sanitizeKey(key), sanitizeValue(value)))
 }
 
 Query.prototype.addCondition = function (condition) {
