@@ -229,6 +229,28 @@ describe('AirtableQuery', function () {
 		})
 	})
 
+	it('supports exists', function (done) {
+
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.exists('Notes')
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+
+				records.forEach(function (record) {
+					assert.equal(record.get('identifier'), 'snorlax')
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		})
+	})
+
 	it('supports each', function (done) {
 
 		var name = 'snorlax'

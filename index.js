@@ -7,7 +7,7 @@ function Query(table) {
 
 	this.table = table
 
-	this.constraints = []
+	this.conditions = []
 }
 
 Query.prototype.firstPage = function(params) {
@@ -84,11 +84,19 @@ Query.prototype.select = function (params) {
 	}
 
 	var self = this
-	return Promise.all(this.constraints).then(function (constraints) {
-		params.filterByFormula = and(constraints)
+	return Promise.all(this.conditions).then(function (conditions) {
+		params.filterByFormula = and(conditions)
 		console.log('filterByFormula: ' + params.filterByFormula)
 		return self.table.select(params)
 	})
+}
+
+Query.prototype.exists = function(key) {
+	return this.addCondition(not(equal(key, 'BLANK()')))
+}
+
+Query.prototype.doesNotExist = function(key) {
+	return this.addComparator(key, 'BLANK()', equal)
 }
 
 Query.prototype.equalTo = function(key, value) {
@@ -98,31 +106,35 @@ Query.prototype.equalTo = function(key, value) {
 		key = 'RECORD_ID()'
 	}
 
-	return this.compare(key, value, equal)
+	return this.addComparator(key, value, equal)
 }
 
 Query.prototype.greaterThan = function (key, value) {
-	return this.compare(key, value, greaterThan)
+	return this.addComparator(key, value, greaterThan)
 }
 
 Query.prototype.greaterThanOrEqualTo = function (key, value) {
-	return this.compare(key, value, greaterThanOrEqualTo)
+	return this.addComparator(key, value, greaterThanOrEqualTo)
 }
 
 Query.prototype.lessThan = function (key, value) {
-	return this.compare(key, value, lessThan)
+	return this.addComparator(key, value, lessThan)
 }
 
 Query.prototype.lessThanOrEqualTo = function (key, value) {
-	return this.compare(key, value, lessThanOrEqualTo)
+	return this.addComparator(key, value, lessThanOrEqualTo)
 }
 
-Query.prototype.compare = function(key, value, operation) {
+Query.prototype.addComparator = function(key, value, operation) {
 
 	key = sanitizeKey(key)
 	value = sanitizeValue(value)
 
-	this.constraints.push(operation(key, value))
+	return this.addCondition(operation(key, value))
+}
+
+Query.prototype.addCondition = function (condition) {
+	this.conditions.push(condition)
 	return this
 }
 
@@ -143,8 +155,7 @@ Query.prototype.containedIn = function(key, array) {
 		operations.push(equal(key, value))
 	})
 
-	this.constraints.push(or(operations))
-	return this
+	return this.addCondition(or(operations))
 }
 
 Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
@@ -165,8 +176,7 @@ Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
 
 	})
 
-	this.constraints.push(promise)
-	return this
+	return this.addCondition(promise)
 }
 
 function and(args) {
@@ -175,6 +185,10 @@ function and(args) {
 
 function or(args) {
 	return logical('OR', args)
+}
+
+function not(value) {
+	return buildFunction('NOT', value)
 }
 
 function logical(name, args) {
@@ -216,22 +230,29 @@ function logicalOperator(val1, operator, val2) {
 
 function buildFunction(name, args) {
 
+	if (args.constructor == Array) {
+		args = unique(args)
 
-	args = unique(args)
+		var string = ''
+		_.each(args, function (arg) {
+			string += arg + ","
+		})
 
-	var argsString = ''
-	_.each(args, function (arg) {
-		argsString += arg + ","
-	})
+		args = string.substring(0, string.length - 1)
+	}
 
-	argsString = argsString.substring(0, argsString.length - 1)
-
-	return name + '(' + argsString + ')'
+	return name + '(' + args + ')'
 }
 
 function isRecordId(value) {
 	//console.log('typeof value: ' + typeof value + ", value.length: " + value.length + ", value.substring: " + value.substring(0, 3))
+	//this should be a regex
 	return typeof value == 'string' && value.length == 17 && value.substring(0, 3) == 'rec'
+}
+
+function isFunction(value) {
+	//this should be a regex
+	return typeof value == 'string' && value.length > 0 && value[value.length - 1] == ')'
 }
 
 function sanitizeKey(key) {
@@ -260,7 +281,7 @@ function sanitizeValue(value) {
 		return 'FALSE()'
 	}
 
-	if (typeof value == 'string') {
+	if (typeof value == 'string' && !isFunction(value)) {
 		return "\"" + value + "\""
 	}
 
