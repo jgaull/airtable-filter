@@ -120,6 +120,26 @@ describe('AirtableQuery', function () {
 		})
 	})
 
+	it('suports isError', function (done) {
+
+		var query = new AirtableQuery(base('Pokemon'))
+		query.isError('Error')
+		query.firstPage().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+				assert.equal(records[0].get('identifier'), 'snorlax')
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		}, function (error) {
+			done(error)
+		})
+	})
+
 	it('supports matchesKeyInQuery', function (done) {
 
 		var name = 'snorlax'

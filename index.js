@@ -152,6 +152,10 @@ Query.prototype.isSame = function (key, date, unit) {
 	return this.addDateCondition('IS_SAME', key, date, sanitizeValue(unit))
 }
 
+Query.prototype.isError = function (key) {
+	return this.addCondition(buildFunction('ISERROR', key))
+}
+
 Query.prototype.addDateCondition = function (functionName, key, date) {
 
 	if (!date) {
@@ -277,6 +281,10 @@ function logicalOperator(val1, operator, val2) {
 }
 
 function buildFunction(name, args) {
+
+	if (!args) {
+		args = ''
+	}
 
 	if (args.constructor == Array) {
 		args = unique(args)
