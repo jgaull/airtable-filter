@@ -280,7 +280,7 @@ describe('AirtableQuery', function () {
 
 		var pokemonQuery = new AirtableQuery(base('Pokemon'))
 		pokemonQuery.exists('Birthday')
-		pokemonQuery.before('Birthday', date)
+		pokemonQuery.isBefore('Birthday', date)
 		pokemonQuery.all().then(function (records) {
 
 			try {
@@ -306,7 +306,7 @@ describe('AirtableQuery', function () {
 
 		var pokemonQuery = new AirtableQuery(base('Pokemon'))
 		pokemonQuery.exists('Birthday')
-		pokemonQuery.after('Birthday', date)
+		pokemonQuery.isAfter('Birthday', date)
 		pokemonQuery.all().then(function (records) {
 
 			try {
@@ -332,7 +332,7 @@ describe('AirtableQuery', function () {
 
 		var pokemonQuery = new AirtableQuery(base('Pokemon'))
 		pokemonQuery.exists('Birthday')
-		pokemonQuery.same('Birthday', date)
+		pokemonQuery.isSame('Birthday', date)
 		pokemonQuery.all().then(function (records) {
 
 			try {
@@ -342,6 +342,32 @@ describe('AirtableQuery', function () {
 				records.forEach(function (record) {
 					var birthday = moment.utc(record.get('Birthday'))
 					assert(birthday.isSame(date))
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		})
+	})
+
+	it('supports same year', function (done) {
+
+		var date = moment.utc('5-7-2017', 'M-D-YYYY')
+
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.exists('Birthday')
+		pokemonQuery.isSame('Birthday', date, 'year')
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 3)
+
+				records.forEach(function (record) {
+					var birthday = moment.utc(record.get('Birthday'))
+					assert.equal(birthday.year(), date.year())
 				})
 
 				done()

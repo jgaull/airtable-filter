@@ -130,16 +130,16 @@ Query.prototype.lessThanOrEqualTo = function (key, value) {
 	return this.addCondition(lessThanOrEqualTo(sanitizeKey(key), sanitizeValue(value)))
 }
 
-Query.prototype.before = function (key, date) {
+Query.prototype.isBefore = function (key, date) {
 	return this.addDateCondition(key, date, 'IS_BEFORE')
 }
 
-Query.prototype.after = function (key, date) {
+Query.prototype.isAfter = function (key, date) {
 	return this.addDateCondition(key, date, 'IS_AFTER')
 }
 
-Query.prototype.same = function (key, date) {
-	return this.addDateCondition(key, date, 'IS_SAME')
+Query.prototype.isSame = function (key, date, unit) {
+	return this.addDateCondition(key, date, 'IS_SAME', sanitizeValue(unit))
 }
 
 Query.prototype.addDateCondition = function (key, date, functionName) {
@@ -158,8 +158,17 @@ Query.prototype.addDateCondition = function (key, date, functionName) {
 		throw new Error('date is not a valid date')
 	}
 
-	value = buildFunction('DATETIME_PARSE', sanitizeValue(date.format()))
-	return this.addCondition(buildFunction(functionName, [key, value]))
+	var value = buildFunction('DATETIME_PARSE', sanitizeValue(date.format()))
+
+	var params = [key, value]
+	for (var i = 3; i < arguments.length; i++) {
+		var argument = arguments[i]
+		if (argument) {
+			params.push(argument)
+		}
+	}
+
+	return this.addCondition(buildFunction(functionName, params))
 }
 
 Query.prototype.addCondition = function (condition) {
