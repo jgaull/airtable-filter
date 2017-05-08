@@ -92,11 +92,15 @@ Query.prototype.select = function (params) {
 }
 
 Query.prototype.exists = function(key) {
+
+	key = sanitizeKey(key)
 	return this.addCondition(not(equal(key, 'BLANK()')))
 }
 
 Query.prototype.doesNotExist = function(key) {
-	return this.addComparator(key, 'BLANK()', equal)
+
+	key = sanitizeKey(key)
+	return this.addCondition(equal(key, 'BLANK()'))
 }
 
 Query.prototype.equalTo = function(key, value) {
