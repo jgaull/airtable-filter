@@ -92,6 +92,37 @@ Query.prototype.select = function (params) {
 	})
 }
 
+Query.prototype.matchesQuery = function (key, query) {
+	return this.matchesKeyInQuery(key, 'RECORD_ID()', query)
+}
+
+Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
+
+	key = sanitizeKey(key)
+	queryKey = sanitizeKey(queryKey)
+
+	var matchValues = []
+
+	var promise = query.all().then(function (results) {
+
+		results.forEach(function (result) {
+
+			var value = queryKey
+			if (!isFunction(queryKey)) {
+				value = sanitizeValue(result.get(queryKey))
+			}
+
+			var operation = equal(key, value)
+			matchValues.push(operation)
+		})
+
+		return or(matchValues)
+
+	})
+
+	return this.addCondition(promise)
+}
+
 Query.prototype.exists = function(key) {
 
 	key = sanitizeKey(key)
@@ -156,6 +187,14 @@ Query.prototype.isError = function (key) {
 	return this.addCondition(buildFunction('ISERROR', key))
 }
 
+Query.prototype.search = function (key, string) {
+
+	key = sanitizeKey(key)
+	string = sanitizeValue(string)
+
+	return this.addCondition(buildFunction('SEARCH', [buildFunction('LOWER', string), buildFunction('LOWER', key)]))
+}
+
 Query.prototype.addDateCondition = function (functionName, key, date) {
 
 	if (!date) {
@@ -208,27 +247,6 @@ Query.prototype.containedIn = function(key, array) {
 	})
 
 	return this.addCondition(or(operations))
-}
-
-Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
-
-	key = sanitizeKey(key)
-	queryKey = sanitizeKey(queryKey)
-
-	var matchValues = []
-
-	var promise = query.all().then(function (results) {
-
-		results.forEach(function (result) {
-			var operation = equal(key, result.get(queryKey))
-			matchValues.push(operation)
-		})
-
-		return or(matchValues)
-
-	})
-
-	return this.addCondition(promise)
 }
 
 function and(args) {

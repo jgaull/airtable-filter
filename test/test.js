@@ -142,21 +142,51 @@ describe('AirtableQuery', function () {
 
 	it('supports matchesKeyInQuery', function (done) {
 
-		var name = 'snorlax'
+		var maxExp = 45
 
 		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.equalTo('identifier', name)
+		pokemonQuery.lessThanOrEqualTo('base experience', maxExp)
 
 		var abilititesQuery = new AirtableQuery(base('Abilities'))
-		abilititesQuery.matchesKeyInQuery('pokemon_id', 'id', pokemonQuery)
+		abilititesQuery.matchesKeyInQuery('pokemon id', 'id', pokemonQuery)
 		abilititesQuery.firstPage().then(function (records) {
 
 			try {
 				assert(records)
-				assert.equal(records.length, 3)
+				//assert.equal(records.length, 3)
 
 				records.forEach(function (record) {
-					assert.equal(record.get('pokemon_id'), 143)
+					assert(record.get('pokemon'))
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+
+		}, function (error) {
+			done(error)
+		})
+	})
+
+	it('supports matchesQuery', function (done) {
+
+		var maxExp = 45
+
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.lessThanOrEqualTo('base experience', maxExp)
+
+		var abilititesQuery = new AirtableQuery(base('Abilities'))
+		abilititesQuery.matchesQuery('pokemon', pokemonQuery)
+		abilititesQuery.firstPage().then(function (records) {
+
+			try {
+				assert(records)
+				//assert.equal(records.length, 3)
+
+				records.forEach(function (record) {
+					assert(record.get('pokemon id'))
 				})
 
 				done()
@@ -418,6 +448,28 @@ describe('AirtableQuery', function () {
 		})
 	})
 
+	it('supports search', function (done) {
+
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.search('identifier', 'oRl')
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+
+				records.forEach(function (record) {
+					assert.equal(record.get('identifier'), 'snorlax')
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		})
+	})
+
 	it('supports each', function (done) {
 
 		var name = 'snorlax'
@@ -428,10 +480,10 @@ describe('AirtableQuery', function () {
 		pokemonQuery.equalTo('identifier', name)
 
 		var abilititesQuery = new AirtableQuery(base('Abilities'))
-		abilititesQuery.matchesKeyInQuery('pokemon_id', 'id', pokemonQuery)
+		abilititesQuery.matchesKeyInQuery('pokemon id', 'id', pokemonQuery)
 
 		abilititesQuery.each(function (record) {
-			assert.equal(record.get('pokemon_id'), 143)
+			assert.equal(record.get('pokemon id'), 143)
 			numRecords++
 
 		}).then(function () {
