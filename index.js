@@ -2,6 +2,7 @@
 var unique = require('array-unique')
 var _ = require('underscore')
 var promise = require('promise')
+var moment = require('moment')
 
 function Query(table) {
 
@@ -129,6 +130,38 @@ Query.prototype.lessThanOrEqualTo = function (key, value) {
 	return this.addCondition(lessThanOrEqualTo(sanitizeKey(key), sanitizeValue(value)))
 }
 
+Query.prototype.before = function (key, date) {
+	return this.addDateCondition(key, date, 'IS_BEFORE')
+}
+
+Query.prototype.after = function (key, date) {
+	return this.addDateCondition(key, date, 'IS_AFTER')
+}
+
+Query.prototype.same = function (key, date) {
+	return this.addDateCondition(key, date, 'IS_SAME')
+}
+
+Query.prototype.addDateCondition = function (key, date, functionName) {
+
+	if (!date) {
+		date = key
+		key = null
+	}
+
+	if (!key) {
+		key = 'CREATED_TIME()'
+	}
+
+	date = moment(date)
+	if (!date.isValid()) {
+		throw new Error('date is not a valid date')
+	}
+
+	value = buildFunction('DATETIME_PARSE', sanitizeValue(date.format()))
+	return this.addCondition(buildFunction(functionName, [key, value]))
+}
+
 Query.prototype.addCondition = function (condition) {
 	this.conditions.push(condition)
 	return this
@@ -183,10 +216,6 @@ function or(args) {
 	return logical('OR', args)
 }
 
-function not(value) {
-	return buildFunction('NOT', value)
-}
-
 function logical(name, args) {
 
 	if (args.length == 1) {
@@ -194,6 +223,10 @@ function logical(name, args) {
 	}
 
 	return buildFunction(name, args)
+}
+
+function not(value) {
+	return buildFunction('NOT', value)
 }
 
 function equal(val1, val2) {

@@ -1,4 +1,5 @@
 var assert = require('assert')
+var moment = require('moment')
 
 var Airtable = require('airtable')
 Airtable.configure({
@@ -263,6 +264,84 @@ describe('AirtableQuery', function () {
 
 				records.forEach(function (record) {
 					assert.equal(record.get('identifier'), 'snorlax')
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		})
+	})
+
+	it('supports before', function (done) {
+
+		var date = moment.utc('5-7-2017', 'M-D-YYYY')
+
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.exists('Birthday')
+		pokemonQuery.before('Birthday', date)
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+
+				records.forEach(function (record) {
+					var birthday = moment.utc(record.get('Birthday'))
+					assert(birthday.isBefore(date))
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		})
+	})
+
+	it('supports after', function (done) {
+
+		var date = moment.utc('5-7-2017', 'M-D-YYYY')
+
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.exists('Birthday')
+		pokemonQuery.after('Birthday', date)
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 2)
+
+				records.forEach(function (record) {
+					var birthday = moment.utc(record.get('Birthday'))
+					assert(birthday.isAfter(date))
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		})
+	})
+
+	it('supports same', function (done) {
+
+		var date = moment.utc('5-7-2017', 'M-D-YYYY')
+
+		var pokemonQuery = new AirtableQuery(base('Pokemon'))
+		pokemonQuery.exists('Birthday')
+		pokemonQuery.same('Birthday', date)
+		pokemonQuery.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 2)
+
+				records.forEach(function (record) {
+					var birthday = moment.utc(record.get('Birthday'))
+					assert(birthday.isSame(date))
 				})
 
 				done()
