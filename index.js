@@ -99,7 +99,6 @@ Query.prototype.matchesQuery = function (key, query) {
 Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
 
 	key = sanitizeKey(key)
-	queryKey = sanitizeKey(queryKey)
 
 	var matchValues = []
 
@@ -361,6 +360,12 @@ function sanitizeValue(value) {
 
 	if (typeof value == 'string' && !isFunction(value)) {
 		return "\"" + value + "\""
+	}
+
+	if (value && value.constructor == Array) {
+		for (var i = 0; i < value.length; i++) {
+			value[i] = sanitizeValue(value[i])
+		}
 	}
 
 	return value

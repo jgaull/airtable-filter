@@ -170,6 +170,36 @@ describe('AirtableQuery', function () {
 		})
 	})
 
+	it.skip('supports matchesKeyInQuery again', function (done) {
+
+		var minLevel = 23
+
+		var lineupQuery = new AirtableQuery(base('Lineup'))
+		lineupQuery.greaterThan('Level', minLevel)
+
+		var abilititesQuery = new AirtableQuery(base('Abilities'))
+		abilititesQuery.matchesKeyInQuery('pokemon', 'Pokemon', lineupQuery)
+		abilititesQuery.firstPage().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 5)
+
+				records.forEach(function (record) {
+					assert(record.get('pokemon id'))
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+
+		}, function (error) {
+			done(error)
+		})
+	})
+
 	it('supports matchesQuery', function (done) {
 
 		var maxExp = 45
