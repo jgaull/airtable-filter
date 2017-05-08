@@ -131,18 +131,18 @@ Query.prototype.lessThanOrEqualTo = function (key, value) {
 }
 
 Query.prototype.isBefore = function (key, date) {
-	return this.addDateCondition(key, date, 'IS_BEFORE')
+	return this.addDateCondition('IS_BEFORE', key, date)
 }
 
 Query.prototype.isAfter = function (key, date) {
-	return this.addDateCondition(key, date, 'IS_AFTER')
+	return this.addDateCondition('IS_AFTER', key, date)
 }
 
 Query.prototype.isSame = function (key, date, unit) {
-	return this.addDateCondition(key, date, 'IS_SAME', sanitizeValue(unit))
+	return this.addDateCondition('IS_SAME', key, date, sanitizeValue(unit))
 }
 
-Query.prototype.addDateCondition = function (key, date, functionName) {
+Query.prototype.addDateCondition = function (functionName, key, date) {
 
 	if (!date) {
 		date = key
