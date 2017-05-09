@@ -4,7 +4,7 @@ var moment = require('moment')
 var Airtable = require('airtable')
 Airtable.configure({
     endpointUrl: 'https://api.airtable.com',
-    apiKey: 'keyoJ4414mR4nEftZ'
+    apiKey: ''
 })
 
 describe('AirtableQuery', function () {
