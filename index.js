@@ -136,12 +136,14 @@ Query.prototype.doesNotExist = function(key) {
 
 Query.prototype.equalTo = function(key, value) {
 
+	key = sanitizeKey(key)
+
 	if (isRecordId(key) && !value) {
 		value = key
 		key = 'RECORD_ID()'
 	}
 
-	return this.addCondition(equal(sanitizeKey(key), sanitizeValue(value)))
+	return this.addCondition(equal(key, sanitizeValue(value)))
 }
 
 Query.prototype.notEqualTo = function (key, value) {
@@ -330,8 +332,12 @@ function isFunction(value) {
 
 function sanitizeKey(key) {
 
+	if (typeof key !== 'string') {
+		key = key.toString()
+	}
+
 	if (key.split(' ').length > 1) {
-		
+	
 		if (key[0] != '{') {
 			key = '{' + key
 		}
