@@ -110,6 +110,9 @@ Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
 			if (!isFunction(queryKey)) {
 				value = sanitizeValue(result.get(queryKey))
 			}
+			else if (queryKey == 'RECORD_ID()') {
+				value = sanitizeValue(result.id)
+			}
 
 			var operation = equal(key, value)
 			matchValues.push(operation)
