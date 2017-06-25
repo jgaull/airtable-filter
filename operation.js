@@ -4,6 +4,8 @@ var _ = require('underscore')
 var promise = require('promise')
 var moment = require('moment')
 
+var logic = require('./logic')
+
 function Operation(filter, key) {
 
 	this.filter = filter
@@ -11,11 +13,11 @@ function Operation(filter, key) {
 }
 
 Operation.prototype.exists = function() {
-	return this.addCondition(not(equal(this.key, 'BLANK()')))
+	return this.addCondition(logic.not(logic.equal(this.key, 'BLANK()')))
 }
 
 Operation.prototype.doesNotExist = function() {
-	return this.addCondition(equal(this.key, 'BLANK()'))
+	return this.addCondition(logic.equal(this.key, 'BLANK()'))
 }
 
 Operation.prototype.equalTo = function(value) {
@@ -26,7 +28,7 @@ Operation.prototype.equalTo = function(value) {
 		key = 'RECORD_ID()'
 	}
 
-	return this.addCondition(equal(key, sanitizeValue(value)))
+	return this.addCondition(logic.equal(key, sanitizeValue(value)))
 }
 
 Operation.prototype.notEqualTo = function (value) {
@@ -37,23 +39,23 @@ Operation.prototype.notEqualTo = function (value) {
 		key = 'RECORD_ID()'
 	}
 
-	return this.addCondition(not(equal(sanitizeKey(key), sanitizeValue(value))))
+	return this.addCondition(logic.not(logic.equal(sanitizeKey(key), sanitizeValue(value))))
 }
 
 Operation.prototype.greaterThan = function (value) {
-	return this.addCondition(greaterThan(sanitizeKey(this.key), sanitizeValue(value)))
+	return this.addCondition(logic.greaterThan(sanitizeKey(this.key), sanitizeValue(value)))
 }
 
 Operation.prototype.greaterThanOrEqualTo = function (value) {
-	return this.addCondition(greaterThanOrEqualTo(sanitizeKey(this.key), sanitizeValue(value)))
+	return this.addCondition(logic.greaterThanOrEqualTo(sanitizeKey(this.key), sanitizeValue(value)))
 }
 
 Operation.prototype.lessThan = function (value) {
-	return this.addCondition(lessThan(sanitizeKey(this.key), sanitizeValue(value)))
+	return this.addCondition(logic.lessThan(sanitizeKey(this.key), sanitizeValue(value)))
 }
 
 Operation.prototype.lessThanOrEqualTo = function (value) {
-	return this.addCondition(lessThanOrEqualTo(sanitizeKey(this.key), sanitizeValue(value)))
+	return this.addCondition(logic.lessThanOrEqualTo(sanitizeKey(this.key), sanitizeValue(value)))
 }
 
 Operation.prototype.isBefore = function (date) {
@@ -69,13 +71,13 @@ Operation.prototype.isSame = function (date, unit) {
 }
 
 Operation.prototype.isError = function () {
-	return this.addCondition(buildFunction('ISERROR', this.key))
+	return this.addCondition(logic.buildFunction('ISERROR', this.key))
 }
 
 Operation.prototype.search = function (string) {
 
 	string = sanitizeValue(string)
-	return this.addCondition(buildFunction('SEARCH', [buildFunction('LOWER', string), buildFunction('LOWER', this.key)]))
+	return this.addCondition(logic.buildFunction('SEARCH', [logic.buildFunction('LOWER', string), logic.buildFunction('LOWER', this.key)]))
 }
 
 Operation.prototype.containedIn = function(array) {
@@ -94,10 +96,10 @@ Operation.prototype.containedIn = function(array) {
 	var operations = []
 	_.each(uniqueArray, function (value) {
 		value = sanitizeValue(value)
-		operations.push(equal(key, value))
+		operations.push(logic.equal(key, value))
 	})
 
-	return this.addCondition(or(operations))
+	return this.addCondition(logic.or(operations))
 }
 
 Operation.prototype.matchesFilter = function (filter) {
@@ -128,19 +130,19 @@ Operation.prototype.matchesKeyInFilter = function(queryKey, filter) {
 				var vals = value
 				var operations = []
 				_.each(vals, function (val) {
-					operations.push(equal(key, val))
+					operations.push(logic.equal(key, val))
 				})
 
-				operation = or(operations)
+				operation = logic.or(operations)
 			}
 			else {
-				operation = equal(key, value)
+				operation = logic.equal(key, value)
 			}
 
 			matchValues.push(operation)
 		})
 
-		return or(matchValues)
+		return logic.or(matchValues)
 
 	})
 
@@ -165,7 +167,7 @@ Operation.prototype.addDateCondition = function (functionName, date) {
 		throw new Error('date is not a valid date')
 	}
 
-	var value = buildFunction('DATETIME_PARSE', sanitizeValue(date.format()))
+	var value = logic.buildFunction('DATETIME_PARSE', sanitizeValue(date.format()))
 
 	var params = [key, value]
 	for (var i = params.length; i < arguments.length; i++) {
@@ -176,82 +178,13 @@ Operation.prototype.addDateCondition = function (functionName, date) {
 		}
 	}
 
-	var built = buildFunction(functionName, params)
-	return this.addCondition(buildFunction(functionName, params))
+	var built = logic.buildFunction(functionName, params)
+	return this.addCondition(logic.buildFunction(functionName, params))
 }
 
 Operation.prototype.addCondition = function (condition) {
 	this.filter.conditions.push(condition)
 	return this
-}
-
-function and(args) {
-	return logical('AND', args)
-}
-
-function or(args) {
-	return logical('OR', args)
-}
-
-function logical(name, args) {
-
-	if (args.length == 1) {
-		return args[0]
-	}
-
-	return buildFunction(name, args)
-}
-
-function not(value) {
-	return buildFunction('NOT', value)
-}
-
-function equal(val1, val2) {
-	return logicalOperator(val1, '=', val2)
-}
-
-function notEqual(val1, val2) {
-	return logicalOperator(val1, '!=', val2)
-}
-
-function greaterThan(val1, val2) {
-	return logicalOperator(val1, '>', val2)
-}
-
-function greaterThanOrEqualTo(val1, val2) {
-	return logicalOperator(val1, '>=', val2)
-}
-
-function lessThan(val1, val2) {
-	return logicalOperator(val1, '<', val2)
-}
-
-function lessThanOrEqualTo(val1, val2) {
-	return logicalOperator(val1, '<=', val2)
-}
-
-function logicalOperator(val1, operator, val2) {
-	return val1 + operator + val2
-}
-
-function buildFunction(name, args) {
-
-	if (!args) {
-		args = ''
-	}
-
-	if (args.constructor == Array) {
-		args = unique(args)
-
-		var string = ''
-		_.each(args, function (arg) {
-			string += arg + ","
-		})
-
-		args = string.substring(0, string.length - 1)
-	}
-
-	return name + '(' + args + ')'
 }
 
 function isRecordId(value) {
