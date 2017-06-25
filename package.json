@@ -1,8 +1,8 @@
 {
   "name": "airtable-filter",
   "version": "0.0.2",
-  "description": "A programatic interface for writing Airtable filters. Inspired by the Parse Javascript SDK.",
-  "main": "index.js",
+  "description": "A programatic interface for writing Airtable filters.",
+  "main": "filter.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
   },
