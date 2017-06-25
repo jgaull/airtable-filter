@@ -4,11 +4,20 @@ var _ = require('underscore')
 var promise = require('promise')
 var moment = require('moment')
 
+var Operation = require('./operation')
+
 function Filter(table) {
 
 	this.table = table
 
 	this.conditions = []
+
+	this.id = this.get('RECORD_ID()')
+	this.createdTime = this.get('CREATED_TIME()')
+}
+
+Filter.prototype.get = function (key) {
+	return new Operation(this, key)
 }
 
 Filter.prototype.firstPage = function(params) {
