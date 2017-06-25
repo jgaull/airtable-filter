@@ -168,13 +168,15 @@ Operation.prototype.addDateCondition = function (functionName, date) {
 	var value = buildFunction('DATETIME_PARSE', sanitizeValue(date.format()))
 
 	var params = [key, value]
-	for (var i = 3; i < arguments.length; i++) {
+	for (var i = params.length; i < arguments.length; i++) {
+
 		var argument = arguments[i]
 		if (argument) {
 			params.push(argument)
 		}
 	}
 
+	var built = buildFunction(functionName, params)
 	return this.addCondition(buildFunction(functionName, params))
 }
 
