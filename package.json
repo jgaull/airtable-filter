@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jgaull/airtable-query.git"
+    "url": "git+https://github.com/jgaull/airtable-filter.git"
   },
   "author": "Jonathan Gaull <jon@bikepretty.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jgaull/airtable-query/issues"
+    "url": "https://github.com/jgaull/airtable-filter/issues"
   },
-  "homepage": "https://github.com/jgaull/airtable-query#readme",
+  "homepage": "https://github.com/jgaull/airtable-filter#readme",
   "dependencies": {
     "airtable": "~0.5.0",
     "array-unique": "^0.3.2",
