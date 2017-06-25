@@ -4,14 +4,14 @@ var _ = require('underscore')
 var promise = require('promise')
 var moment = require('moment')
 
-function Query(table) {
+function Filter(table) {
 
 	this.table = table
 
 	this.conditions = []
 }
 
-Query.prototype.firstPage = function(params) {
+Filter.prototype.firstPage = function(params) {
 
 	return this.select(params).then(function (select) {
 
@@ -29,7 +29,7 @@ Query.prototype.firstPage = function(params) {
 	})
 }
 
-Query.prototype.all = function(params) {
+Filter.prototype.all = function(params) {
 
 	return this.select(params).then(function (select) {
 
@@ -47,7 +47,7 @@ Query.prototype.all = function(params) {
 	})
 }
 
-Query.prototype.each = function(params, eachCallback) {
+Filter.prototype.each = function(params, eachCallback) {
 
 	if (typeof params === 'function') {
 		eachCallback = params
@@ -78,7 +78,7 @@ Query.prototype.each = function(params, eachCallback) {
 	})
 }
 
-Query.prototype.select = function (params) {
+Filter.prototype.select = function (params) {
 
 	if (!params) {
 		params = {}
@@ -92,11 +92,11 @@ Query.prototype.select = function (params) {
 	})
 }
 
-Query.prototype.matchesQuery = function (key, query) {
+Filter.prototype.matchesQuery = function (key, query) {
 	return this.matchesKeyInQuery(key, 'RECORD_ID()', query)
 }
 
-Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
+Filter.prototype.matchesKeyInQuery = function(key, queryKey, query) {
 
 	key = sanitizeKey(key)
 
@@ -139,19 +139,19 @@ Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
 	return this.addCondition(promise)
 }
 
-Query.prototype.exists = function(key) {
+Filter.prototype.exists = function(key) {
 
 	key = sanitizeKey(key)
 	return this.addCondition(not(equal(key, 'BLANK()')))
 }
 
-Query.prototype.doesNotExist = function(key) {
+Filter.prototype.doesNotExist = function(key) {
 
 	key = sanitizeKey(key)
 	return this.addCondition(equal(key, 'BLANK()'))
 }
 
-Query.prototype.equalTo = function(key, value) {
+Filter.prototype.equalTo = function(key, value) {
 
 	key = sanitizeKey(key)
 
@@ -163,7 +163,7 @@ Query.prototype.equalTo = function(key, value) {
 	return this.addCondition(equal(key, sanitizeValue(value)))
 }
 
-Query.prototype.notEqualTo = function (key, value) {
+Filter.prototype.notEqualTo = function (key, value) {
 
 	if (isRecordId(key) && !value) {
 		value = key
@@ -173,39 +173,39 @@ Query.prototype.notEqualTo = function (key, value) {
 	return this.addCondition(not(equal(sanitizeKey(key), sanitizeValue(value))))
 }
 
-Query.prototype.greaterThan = function (key, value) {
+Filter.prototype.greaterThan = function (key, value) {
 	return this.addCondition(greaterThan(sanitizeKey(key), sanitizeValue(value)))
 }
 
-Query.prototype.greaterThanOrEqualTo = function (key, value) {
+Filter.prototype.greaterThanOrEqualTo = function (key, value) {
 	return this.addCondition(greaterThanOrEqualTo(sanitizeKey(key), sanitizeValue(value)))
 }
 
-Query.prototype.lessThan = function (key, value) {
+Filter.prototype.lessThan = function (key, value) {
 	return this.addCondition(lessThan(sanitizeKey(key), sanitizeValue(value)))
 }
 
-Query.prototype.lessThanOrEqualTo = function (key, value) {
+Filter.prototype.lessThanOrEqualTo = function (key, value) {
 	return this.addCondition(lessThanOrEqualTo(sanitizeKey(key), sanitizeValue(value)))
 }
 
-Query.prototype.isBefore = function (key, date) {
+Filter.prototype.isBefore = function (key, date) {
 	return this.addDateCondition('IS_BEFORE', key, date)
 }
 
-Query.prototype.isAfter = function (key, date) {
+Filter.prototype.isAfter = function (key, date) {
 	return this.addDateCondition('IS_AFTER', key, date)
 }
 
-Query.prototype.isSame = function (key, date, unit) {
+Filter.prototype.isSame = function (key, date, unit) {
 	return this.addDateCondition('IS_SAME', key, date, sanitizeValue(unit))
 }
 
-Query.prototype.isError = function (key) {
+Filter.prototype.isError = function (key) {
 	return this.addCondition(buildFunction('ISERROR', key))
 }
 
-Query.prototype.search = function (key, string) {
+Filter.prototype.search = function (key, string) {
 
 	key = sanitizeKey(key)
 	string = sanitizeValue(string)
@@ -213,7 +213,7 @@ Query.prototype.search = function (key, string) {
 	return this.addCondition(buildFunction('SEARCH', [buildFunction('LOWER', string), buildFunction('LOWER', key)]))
 }
 
-Query.prototype.addDateCondition = function (functionName, key, date) {
+Filter.prototype.addDateCondition = function (functionName, key, date) {
 
 	if (!date) {
 		date = key
@@ -242,12 +242,12 @@ Query.prototype.addDateCondition = function (functionName, key, date) {
 	return this.addCondition(buildFunction(functionName, params))
 }
 
-Query.prototype.addCondition = function (condition) {
+Filter.prototype.addCondition = function (condition) {
 	this.conditions.push(condition)
 	return this
 }
 
-Query.prototype.containedIn = function(key, array) {
+Filter.prototype.containedIn = function(key, array) {
 	//console.log('typeof key: ' + typeof key + ', key.length: ' + key.length + ', isRecordId(): ' + isRecordId(key[0]))
 	if (key.constructor == Array && key.length > 0 && isRecordId(key[0]) && !array) {
 		array = key
@@ -394,4 +394,4 @@ function sanitizeValue(value) {
 	return value
 }
 
-module.exports = Query
+module.exports = Filter
