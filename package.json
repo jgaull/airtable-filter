@@ -1,8 +1,8 @@
 {
-  "name": "airtable-query",
-  "version": "0.0.1",
-  "description": "An easy and intuitive interface for creating queries on your Airtable bases",
-  "main": "index.js",
+  "name": "airtable-filter",
+  "version": "0.0.2",
+  "description": "A programatic interface for writing Airtable filters.",
+  "main": "filter.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
   },

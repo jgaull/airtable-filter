@@ -9,20 +9,20 @@ Airtable.configure({
     apiKey: process.env.AIRTABLE_API_KEY || ''
 })
 
-describe('AirtableQuery', function () {
+describe('Filter', function () {
 
 	this.timeout(5000)
 
-	var AirtableQuery = require('../index')
-	var base = Airtable.base('appx65wZlf4173yqx')
+	var Filter = require('../filter')
+	var table = Airtable.base('appx65wZlf4173yqx')
 
 	it('supports containedIn', function (done) {
 
 		var ids = ['2', '101', '1']
 
-		var query = new AirtableQuery(base('Pokemon'))
-		query.containedIn("id", ids)
-		query.firstPage().then(function(records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('id').isContainedIn(ids)
+		pokemon.firstPage().then(function(records) {
 
 			try {
 				assert(records)
@@ -42,9 +42,9 @@ describe('AirtableQuery', function () {
 
 		var recordIds = ['rec26TzCrvUuZvKLC', 'recZjsPlLtKAwgK4I', 'reczBVQyj0iGlPNO5']
 
-		var query = new AirtableQuery(base('Pokemon'))
-		query.containedIn(recordIds)
-		query.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.id.isContainedIn(recordIds)
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -64,9 +64,9 @@ describe('AirtableQuery', function () {
 
 		var name = 'snorlax'
 
-		var query = new AirtableQuery(base('Pokemon'))
-		query.equalTo('identifier', name)
-		query.firstPage().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('identifier').isEqualTo(name)
+		pokemon.firstPage().then(function (records) {
 
 			try {
 				assert(records)
@@ -84,9 +84,9 @@ describe('AirtableQuery', function () {
 
 	it('supports equalTo RECORD_ID()', function (done) {
 
-		var query = new AirtableQuery(base('Pokemon'))
-		query.equalTo('rec26TzCrvUuZvKLC')
-		query.firstPage().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.id.isEqualTo('rec26TzCrvUuZvKLC')
+		pokemon.firstPage().then(function (records) {
 
 			try {
 				assert(records)
@@ -102,11 +102,11 @@ describe('AirtableQuery', function () {
 		})
 	})
 
-	it('suports equalTo null', function (done) {
+	it('suports notEqualTo null', function (done) {
 
-		var query = new AirtableQuery(base('Pokemon'))
-		query.notEqualTo('Notes', null)
-		query.firstPage().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('Notes').isNotEqualTo(null)
+		pokemon.firstPage().then(function (records) {
 
 			try {
 				assert(records)
@@ -124,9 +124,9 @@ describe('AirtableQuery', function () {
 
 	it('supports isError', function (done) {
 
-		var query = new AirtableQuery(base('Pokemon'))
-		query.isError('Error')
-		query.firstPage().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('Error').isError()
+		pokemon.firstPage().then(function (records) {
 
 			try {
 				assert(records)
@@ -142,16 +142,16 @@ describe('AirtableQuery', function () {
 		})
 	})
 
-	it('supports matchesKeyInQuery', function (done) {
+	it('supports matchesKeyInFilter', function (done) {
 
 		var maxExp = 45
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.lessThanOrEqualTo('base experience', maxExp)
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('base experience').isLessThanOrEqualTo(maxExp)
 
-		var abilititesQuery = new AirtableQuery(base('Abilities'))
-		abilititesQuery.matchesKeyInQuery('pokemon id', 'id', pokemonQuery)
-		abilititesQuery.firstPage().then(function (records) {
+		var abilities = new Filter(table('Abilities'))
+		abilities.field('pokemon id').matchesKeyInFilter('id', pokemon)
+		abilities.firstPage().then(function (records) {
 
 			try {
 				assert(records)
@@ -176,10 +176,10 @@ describe('AirtableQuery', function () {
 
 		var minLevel = 23
 
-		var lineupQuery = new AirtableQuery(base('Lineup'))
-		lineupQuery.greaterThan('Level', minLevel)
+		var lineupQuery = new Filter(table('Lineup'))
+		lineupQuery.isGreaterThan('Level', minLevel)
 
-		var abilititesQuery = new AirtableQuery(base('Abilities'))
+		var abilititesQuery = new Filter(table('Abilities'))
 		abilititesQuery.matchesKeyInQuery('pokemon', 'Pokemon', lineupQuery)
 		abilititesQuery.firstPage().then(function (records) {
 
@@ -202,16 +202,16 @@ describe('AirtableQuery', function () {
 		})
 	})
 
-	it('supports matchesQuery', function (done) {
+	it('supports matchesFilter', function (done) {
 
 		var maxExp = 45
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.lessThanOrEqualTo('base experience', maxExp)
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('base experience').isLessThanOrEqualTo(maxExp)
 
-		var abilititesQuery = new AirtableQuery(base('Abilities'))
-		abilititesQuery.matchesQuery('pokemon', pokemonQuery)
-		abilititesQuery.firstPage().then(function (records) {
+		var abilities = new Filter(table('Abilities'))
+		abilities.field('pokemon').matchesFilter(pokemon)
+		abilities.firstPage().then(function (records) {
 
 			try {
 				assert(records)
@@ -235,9 +235,9 @@ describe('AirtableQuery', function () {
 	it('supports greaterThan', function (done) {
 
 		var height = 25
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.greaterThan('height', height)
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('height').isGreaterThan(height)
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -260,9 +260,9 @@ describe('AirtableQuery', function () {
 	it('supports greaterThanOrEqualTo', function (done) {
 
 		var height = 25
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.greaterThanOrEqualTo('height', height)
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('height').isGreaterThanOrEqualTo(height)
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -285,9 +285,9 @@ describe('AirtableQuery', function () {
 	it('supports lessThan', function (done) {
 
 		var height = 3
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.lessThan('height', height)
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('height').isLessThan(height)
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -310,9 +310,9 @@ describe('AirtableQuery', function () {
 	it('supports lessThanOrEqualTo', function (done) {
 
 		var height = 2
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.lessThanOrEqualTo('height', height)
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('height').isLessThanOrEqualTo(height)
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -334,9 +334,9 @@ describe('AirtableQuery', function () {
 
 	it('supports exists', function (done) {
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.exists('Notes')
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('Notes').exists()
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -356,9 +356,9 @@ describe('AirtableQuery', function () {
 
 	it('supports doesNotExist', function (done) {
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.doesNotExist('Inverse Notes')
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('Inverse Notes').doesNotExist()
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -380,10 +380,9 @@ describe('AirtableQuery', function () {
 
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.exists('Birthday')
-		pokemonQuery.isBefore('Birthday', date)
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('Birthday').exists().isBefore(date)
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -406,10 +405,9 @@ describe('AirtableQuery', function () {
 
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.exists('Birthday')
-		pokemonQuery.isAfter('Birthday', date)
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('Birthday').exists('Birthday').isAfter(date)
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -432,10 +430,9 @@ describe('AirtableQuery', function () {
 
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.exists('Birthday')
-		pokemonQuery.isSame('Birthday', date)
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('Birthday').exists().isSame(date)
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -458,10 +455,9 @@ describe('AirtableQuery', function () {
 
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.exists('Birthday')
-		pokemonQuery.isSame('Birthday', date, 'year')
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('Birthday').exists().isSame(date, 'year')
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -482,9 +478,9 @@ describe('AirtableQuery', function () {
 
 	it('supports search', function (done) {
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.search('identifier', 'oRl')
-		pokemonQuery.all().then(function (records) {
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('identifier').search('oRl')
+		pokemon.all().then(function (records) {
 
 			try {
 				assert(records)
@@ -508,15 +504,20 @@ describe('AirtableQuery', function () {
 
 		var numRecords = 0
 
-		var pokemonQuery = new AirtableQuery(base('Pokemon'))
-		pokemonQuery.equalTo('identifier', name)
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.field('identifier').isEqualTo(name)
 
-		var abilititesQuery = new AirtableQuery(base('Abilities'))
-		abilititesQuery.matchesKeyInQuery('pokemon id', 'id', pokemonQuery)
+		var abilitites = new Filter(table('Abilities'))
+		abilitites.field('pokemon id').matchesKeyInFilter('id', pokemon)
+		abilitites.each(function (record) {
 
-		abilititesQuery.each(function (record) {
-			assert.equal(record.get('pokemon id'), 143)
-			numRecords++
+			try {
+				assert.equal(record.get('pokemon id'), 143)
+				numRecords++
+			}
+			catch (e) {
+				console.log(done(e))
+			}
 
 		}).then(function () {
 
