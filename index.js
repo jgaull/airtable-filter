@@ -114,7 +114,21 @@ Query.prototype.matchesKeyInQuery = function(key, queryKey, query) {
 				value = sanitizeValue(result.id)
 			}
 
-			var operation = equal(key, value)
+			var operation = ''
+			if (value.constructor == Array) {
+
+				var vals = value
+				var operations = []
+				_.each(vals, function (val) {
+					operations.push(equal(key, val))
+				})
+
+				operation = or(operations)
+			}
+			else {
+				operation = equal(key, value)
+			}
+
 			matchValues.push(operation)
 		})
 

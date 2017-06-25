@@ -1,10 +1,12 @@
+
+
 var assert = require('assert')
 var moment = require('moment')
 
 var Airtable = require('airtable')
 Airtable.configure({
     endpointUrl: 'https://api.airtable.com',
-    apiKey: ''
+    apiKey: process.env.AIRTABLE_API_KEY || ''
 })
 
 describe('AirtableQuery', function () {
