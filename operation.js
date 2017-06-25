@@ -20,7 +20,7 @@ Operation.prototype.doesNotExist = function() {
 	return this.addCondition(logic.equal(this.key, 'BLANK()'))
 }
 
-Operation.prototype.equalTo = function(value) {
+Operation.prototype.isEqualTo = function(value) {
 
 	var key = this.key
 	if (isRecordId(key) && !value) {
@@ -31,7 +31,7 @@ Operation.prototype.equalTo = function(value) {
 	return this.addCondition(logic.equal(key, sanitizeValue(value)))
 }
 
-Operation.prototype.notEqualTo = function (value) {
+Operation.prototype.isNotEqualTo = function (value) {
 
 	var key = this.key
 	if (isRecordId(key) && !value) {
@@ -42,19 +42,19 @@ Operation.prototype.notEqualTo = function (value) {
 	return this.addCondition(logic.not(logic.equal(sanitizeKey(key), sanitizeValue(value))))
 }
 
-Operation.prototype.greaterThan = function (value) {
+Operation.prototype.isGreaterThan = function (value) {
 	return this.addCondition(logic.greaterThan(sanitizeKey(this.key), sanitizeValue(value)))
 }
 
-Operation.prototype.greaterThanOrEqualTo = function (value) {
+Operation.prototype.isGreaterThanOrEqualTo = function (value) {
 	return this.addCondition(logic.greaterThanOrEqualTo(sanitizeKey(this.key), sanitizeValue(value)))
 }
 
-Operation.prototype.lessThan = function (value) {
+Operation.prototype.isLessThan = function (value) {
 	return this.addCondition(logic.lessThan(sanitizeKey(this.key), sanitizeValue(value)))
 }
 
-Operation.prototype.lessThanOrEqualTo = function (value) {
+Operation.prototype.isLessThanOrEqualTo = function (value) {
 	return this.addCondition(logic.lessThanOrEqualTo(sanitizeKey(this.key), sanitizeValue(value)))
 }
 
@@ -80,7 +80,7 @@ Operation.prototype.search = function (string) {
 	return this.addCondition(logic.buildFunction('SEARCH', [logic.buildFunction('LOWER', string), logic.buildFunction('LOWER', this.key)]))
 }
 
-Operation.prototype.containedIn = function(array) {
+Operation.prototype.isContainedIn = function(array) {
 	//console.log('typeof key: ' + typeof key + ', key.length: ' + key.length + ', isRecordId(): ' + isRecordId(key[0]))
 	var key = this.key
 	
