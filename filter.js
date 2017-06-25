@@ -13,11 +13,11 @@ function Filter(table) {
 
 	this.conditions = []
 
-	this.id = this.get('RECORD_ID()')
-	this.createdTime = this.get('CREATED_TIME()')
+	this.id = this.field('RECORD_ID()')
+	this.createdTime = this.field('CREATED_TIME()')
 }
 
-Filter.prototype.get = function (key) {
+Filter.prototype.field = function (key) {
 	return new Operation(this, key)
 }
 

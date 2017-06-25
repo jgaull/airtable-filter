@@ -21,7 +21,7 @@ describe('Filter', function () {
 		var ids = ['2', '101', '1']
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('id').containedIn(ids)
+		pokemon.field('id').containedIn(ids)
 		pokemon.firstPage().then(function(records) {
 
 			try {
@@ -65,7 +65,7 @@ describe('Filter', function () {
 		var name = 'snorlax'
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('identifier').equalTo(name)
+		pokemon.field('identifier').equalTo(name)
 		pokemon.firstPage().then(function (records) {
 
 			try {
@@ -105,7 +105,7 @@ describe('Filter', function () {
 	it('suports notEqualTo null', function (done) {
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('Notes').notEqualTo(null)
+		pokemon.field('Notes').notEqualTo(null)
 		pokemon.firstPage().then(function (records) {
 
 			try {
@@ -125,7 +125,7 @@ describe('Filter', function () {
 	it('supports isError', function (done) {
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('Error').isError()
+		pokemon.field('Error').isError()
 		pokemon.firstPage().then(function (records) {
 
 			try {
@@ -147,10 +147,10 @@ describe('Filter', function () {
 		var maxExp = 45
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('base experience').lessThanOrEqualTo(maxExp)
+		pokemon.field('base experience').lessThanOrEqualTo(maxExp)
 
 		var abilities = new Filter(table('Abilities'))
-		abilities.get('pokemon id').matchesKeyInFilter('id', pokemon)
+		abilities.field('pokemon id').matchesKeyInFilter('id', pokemon)
 		abilities.firstPage().then(function (records) {
 
 			try {
@@ -207,10 +207,10 @@ describe('Filter', function () {
 		var maxExp = 45
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('base experience').lessThanOrEqualTo(maxExp)
+		pokemon.field('base experience').lessThanOrEqualTo(maxExp)
 
 		var abilities = new Filter(table('Abilities'))
-		abilities.get('pokemon').matchesFilter(pokemon)
+		abilities.field('pokemon').matchesFilter(pokemon)
 		abilities.firstPage().then(function (records) {
 
 			try {
@@ -236,7 +236,7 @@ describe('Filter', function () {
 
 		var height = 25
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('height').greaterThan(height)
+		pokemon.field('height').greaterThan(height)
 		pokemon.all().then(function (records) {
 
 			try {
@@ -261,7 +261,7 @@ describe('Filter', function () {
 
 		var height = 25
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('height').greaterThanOrEqualTo(height)
+		pokemon.field('height').greaterThanOrEqualTo(height)
 		pokemon.all().then(function (records) {
 
 			try {
@@ -286,7 +286,7 @@ describe('Filter', function () {
 
 		var height = 3
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('height').lessThan(height)
+		pokemon.field('height').lessThan(height)
 		pokemon.all().then(function (records) {
 
 			try {
@@ -311,7 +311,7 @@ describe('Filter', function () {
 
 		var height = 2
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('height').lessThanOrEqualTo(height)
+		pokemon.field('height').lessThanOrEqualTo(height)
 		pokemon.all().then(function (records) {
 
 			try {
@@ -335,7 +335,7 @@ describe('Filter', function () {
 	it('supports exists', function (done) {
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('Notes').exists()
+		pokemon.field('Notes').exists()
 		pokemon.all().then(function (records) {
 
 			try {
@@ -357,7 +357,7 @@ describe('Filter', function () {
 	it('supports doesNotExist', function (done) {
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('Inverse Notes').doesNotExist()
+		pokemon.field('Inverse Notes').doesNotExist()
 		pokemon.all().then(function (records) {
 
 			try {
@@ -381,7 +381,7 @@ describe('Filter', function () {
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('Birthday').exists().isBefore(date)
+		pokemon.field('Birthday').exists().isBefore(date)
 		pokemon.all().then(function (records) {
 
 			try {
@@ -406,7 +406,7 @@ describe('Filter', function () {
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('Birthday').exists('Birthday').isAfter(date)
+		pokemon.field('Birthday').exists('Birthday').isAfter(date)
 		pokemon.all().then(function (records) {
 
 			try {
@@ -431,7 +431,7 @@ describe('Filter', function () {
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('Birthday').exists().isSame(date)
+		pokemon.field('Birthday').exists().isSame(date)
 		pokemon.all().then(function (records) {
 
 			try {
@@ -456,7 +456,7 @@ describe('Filter', function () {
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('Birthday').exists().isSame(date, 'year')
+		pokemon.field('Birthday').exists().isSame(date, 'year')
 		pokemon.all().then(function (records) {
 
 			try {
@@ -479,7 +479,7 @@ describe('Filter', function () {
 	it('supports search', function (done) {
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('identifier').search('oRl')
+		pokemon.field('identifier').search('oRl')
 		pokemon.all().then(function (records) {
 
 			try {
@@ -505,10 +505,10 @@ describe('Filter', function () {
 		var numRecords = 0
 
 		var pokemon = new Filter(table('Pokemon'))
-		pokemon.get('identifier').equalTo(name)
+		pokemon.field('identifier').equalTo(name)
 
 		var abilitites = new Filter(table('Abilities'))
-		abilitites.get('pokemon id').matchesKeyInFilter('id', pokemon)
+		abilitites.field('pokemon id').matchesKeyInFilter('id', pokemon)
 		abilitites.each(function (record) {
 
 			try {
