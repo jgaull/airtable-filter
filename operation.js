@@ -103,10 +103,10 @@ Operation.prototype.isContainedIn = function(array) {
 }
 
 Operation.prototype.matchesFilter = function (filter) {
-	return this.matchesKeyInFilter('RECORD_ID()', filter)
+	return this.matchesFieldInFilter('RECORD_ID()', filter)
 }
 
-Operation.prototype.matchesKeyInFilter = function(queryKey, filter) {
+Operation.prototype.matchesFieldInFilter = function(queryKey, filter) {
 
 	key = this.key
 

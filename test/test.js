@@ -142,7 +142,7 @@ describe('Filter', function () {
 		})
 	})
 
-	it('supports matchesKeyInFilter', function (done) {
+	it('supports matchesFieldInFilter', function (done) {
 
 		var maxExp = 45
 
@@ -150,7 +150,7 @@ describe('Filter', function () {
 		pokemon.field('base experience').isLessThanOrEqualTo(maxExp)
 
 		var abilities = new Filter(table('Abilities'))
-		abilities.field('pokemon id').matchesKeyInFilter('id', pokemon)
+		abilities.field('pokemon id').matchesFieldInFilter('id', pokemon)
 		abilities.firstPage().then(function (records) {
 
 			try {
@@ -508,7 +508,7 @@ describe('Filter', function () {
 		pokemon.field('identifier').isEqualTo(name)
 
 		var abilitites = new Filter(table('Abilities'))
-		abilitites.field('pokemon id').matchesKeyInFilter('id', pokemon)
+		abilitites.field('pokemon id').matchesFieldInFilter('id', pokemon)
 		abilitites.each(function (record) {
 
 			try {
