@@ -1,6 +1,5 @@
 
 var unique = require('array-unique')
-var _ = require('underscore')
 var promise = require('promise')
 var moment = require('moment')
 

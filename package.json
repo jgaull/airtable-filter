@@ -1,7 +1,7 @@
 {
   "name": "airtable-filter",
   "version": "0.0.2",
-  "description": "A programatic interface for writing Airtable filters.",
+  "description": "A programatic interface for writing Airtable filter functions.",
   "main": "filter.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
@@ -20,8 +20,7 @@
     "airtable": "~0.5.0",
     "array-unique": "^0.3.2",
     "moment": "^2.18.1",
-    "promise": "^7.1.1",
-    "underscore": ">=1.1.7"
+    "promise": "^7.1.1"
   },
   "devDependencies": {
     "mocha": "^3.3.0"
