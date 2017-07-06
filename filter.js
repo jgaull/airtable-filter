@@ -2,6 +2,7 @@
 var unique = require('array-unique')
 var promise = require('promise')
 var moment = require('moment')
+var _ = require('underscore')
 
 var Operation = require('./operation')
 var logic = require('./logic')
@@ -11,6 +12,7 @@ function Filter(table) {
 	this.table = table
 
 	this.conditions = []
+	this.includes = []
 
 	this.id = this.where('RECORD_ID()')
 	this.createdTime = this.where('CREATED_TIME()')
@@ -40,6 +42,8 @@ Filter.prototype.firstPage = function(params) {
 
 Filter.prototype.all = function(params) {
 
+	var loadedRecords
+	var self = this
 	return this.select(params).then(function (select) {
 
 		return new Promise(function (resolve, reject) {
@@ -53,6 +57,53 @@ Filter.prototype.all = function(params) {
 				resolve(records)
 			})
 		})
+
+	}).then(function (records) {
+
+		loadedRecords = records
+		var serializedPromise = Promise.resolve()
+		_.each(self.includes, function (include) {
+
+			var key = include.key
+			var table = include.table
+
+			if (loadedRecords.length > 0 && isPointer(loadedRecords[0], key)) {
+
+				var ids = []
+				loadedRecords.forEach(function (record) {
+					ids = ids.concat(record.get(key))
+				})
+
+				serializedPromise = serializedPromise.then(function () {
+
+					var filterRelatedRecords = new Filter(table)
+					filterRelatedRecords.id.isContainedIn(ids)
+					return filterRelatedRecords.all()
+
+				}).then(function (relatedRecords) {
+
+					var relatedRecordsHash = {}
+					_.each(relatedRecords, function (relatedRecord) {
+						relatedRecordsHash[relatedRecord.id] = relatedRecord
+					})
+
+					_.each(loadedRecords, function (record) {
+						var relations = record.get(key)
+						for (var i = 0; i < relations.length; i++) {
+							var relationId = relations[i]
+							relations[i] = relatedRecordsHash[relationId]
+						}
+					})
+
+					return Promise.resolve()
+				})
+			}
+		})
+
+		return serializedPromise
+
+	}).then(function () {
+		return loadedRecords
 	})
 }
 
@@ -99,6 +150,44 @@ Filter.prototype.select = function (params) {
 		//console.log('filterByFormula: ' + params.filterByFormula)
 		return self.table.select(params)
 	})
+}
+
+Filter.prototype.include = function (key, table) {
+
+	if (!key) {
+		throw new Error('key is a required parameter')
+	}
+
+	if (typeof key != 'string') {
+		throw new Error('typeof key ' + key + ' must be string')
+	}
+
+	if (!table) {
+		throw new Error('fromTable is a required parameter')
+	}
+
+	this.includes.push({
+		key: key,
+		table: table
+	})
+
+	return this
+}
+
+function isPointer(record, key) {
+
+	var pointers = record.get(key)
+	if (pointers.constructor == Array && pointers.length > 0) {
+		var firstPointer = pointers[0]
+		return isRecordId(firstPointer)
+	}
+
+	return false
+}
+
+function isRecordId(value) {
+	var regex = new RegExp('^rec[a-zA-Z0-9]{14}$')
+	return typeof value == 'string' && regex.test(value)
 }
 
 module.exports = Filter

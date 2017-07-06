@@ -498,6 +498,40 @@ describe('Filter', function () {
 		})
 	})
 
+	it('supports include', function (done) {
+
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.where('identifier').search('oRl')
+		pokemon.include('Abilities', table('Abilities'))
+		pokemon.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+
+				var abilityIds = [143.17,143.47,143.82]
+
+				records.forEach(function (record) {
+					assert.equal(record.get('identifier'), 'snorlax')
+
+					var abilitites = record.get('Abilities')
+					for (var i = 0; i < abilitites.length; i++) {
+						var ability = abilitites[i]
+
+						assert.equal(typeof ability, 'object')
+						assert(ability.id)
+						assert.equal(ability.get('id'), abilityIds[i])
+					}
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		})
+	})
+
 	it('supports each', function (done) {
 
 		var name = 'snorlax'
