@@ -42,7 +42,6 @@ Filter.prototype.firstPage = function(params) {
 
 Filter.prototype.all = function(params) {
 
-	var loadedRecords
 	var self = this
 	return this.select(params).then(function (select) {
 
@@ -59,51 +58,7 @@ Filter.prototype.all = function(params) {
 		})
 
 	}).then(function (records) {
-
-		loadedRecords = records
-		var serializedPromise = Promise.resolve()
-		_.each(self.includes, function (include) {
-
-			var key = include.key
-			var table = include.table
-
-			if (loadedRecords.length > 0 && isPointer(loadedRecords[0], key)) {
-
-				var ids = []
-				loadedRecords.forEach(function (record) {
-					ids = ids.concat(record.get(key))
-				})
-
-				serializedPromise = serializedPromise.then(function () {
-
-					var filterRelatedRecords = new Filter(table)
-					filterRelatedRecords.id.isContainedIn(ids)
-					return filterRelatedRecords.all()
-
-				}).then(function (relatedRecords) {
-
-					var relatedRecordsHash = {}
-					_.each(relatedRecords, function (relatedRecord) {
-						relatedRecordsHash[relatedRecord.id] = relatedRecord
-					})
-
-					_.each(loadedRecords, function (record) {
-						var relations = record.get(key)
-						for (var i = 0; i < relations.length; i++) {
-							var relationId = relations[i]
-							relations[i] = relatedRecordsHash[relationId]
-						}
-					})
-
-					return Promise.resolve()
-				})
-			}
-		})
-
-		return serializedPromise
-
-	}).then(function () {
-		return loadedRecords
+		return replaceIncludes(records, self.includes)
 	})
 }
 
@@ -172,6 +127,54 @@ Filter.prototype.include = function (key, table) {
 	})
 
 	return this
+}
+
+function replaceIncludes(records, includes) {
+
+	var serializedPromise = Promise.resolve()
+	_.each(includes, function (include) {
+
+		var key = include.key
+		var table = include.table
+		if (records.length > 0 && isPointer(records[0], key)) {
+
+			var ids = []
+			records.forEach(function (record) {
+				ids = ids.concat(record.get(key))
+			})
+
+			serializedPromise = serializedPromise.then(function () {
+
+				var filterRelatedRecords = new Filter(table)
+				filterRelatedRecords.id.isContainedIn(ids)
+				return filterRelatedRecords.all()
+
+			}).then(function (relatedRecords) {
+
+				var relatedRecordsHash = {}
+
+				_.each(relatedRecords, function (relatedRecord) {
+					relatedRecordsHash[relatedRecord.id] = relatedRecord
+				})
+
+				_.each(records, function (record) {
+
+					var relations = record.get(key)
+					for (var i = 0; i < relations.length; i++) {
+
+						var relationId = relations[i]
+						relations[i] = relatedRecordsHash[relationId]
+					}
+				})
+
+				return Promise.resolve()
+			})
+		}
+	})
+
+	return serializedPromise.then(function () {
+		return records
+	})
 }
 
 function isPointer(record, key) {

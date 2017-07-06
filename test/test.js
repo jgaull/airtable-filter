@@ -498,7 +498,7 @@ describe('Filter', function () {
 		})
 	})
 
-	it('supports include', function (done) {
+	it.only('supports include', function (done) {
 
 		var pokemon = new Filter(table('Pokemon'))
 		pokemon.where('identifier').search('oRl')
@@ -508,7 +508,7 @@ describe('Filter', function () {
 			try {
 				assert(records)
 				assert.equal(records.length, 1)
-
+				//console.log('records: ' + JSON.stringify(records))
 				var abilityIds = [143.17,143.47,143.82]
 
 				records.forEach(function (record) {
@@ -529,6 +529,9 @@ describe('Filter', function () {
 			catch (e) {
 				done(e)
 			}
+
+		}, function (error) {
+			done(error)
 		})
 	})
 
