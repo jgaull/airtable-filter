@@ -12,11 +12,11 @@ function Filter(table) {
 
 	this.conditions = []
 
-	this.id = this.field('RECORD_ID()')
-	this.createdTime = this.field('CREATED_TIME()')
+	this.id = this.where('RECORD_ID()')
+	this.createdTime = this.where('CREATED_TIME()')
 }
 
-Filter.prototype.field = function (key) {
+Filter.prototype.where = function (key) {
 	return new Operation(this, key)
 }
 
