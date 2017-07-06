@@ -72,17 +72,24 @@ Filter.prototype.each = function(params, eachCallback) {
 		params = null
 	}
 
+	var self = this
 	return this.select(params).then(function (select) {
 
 		return new Promise(function (resolve, reject) {
 
 			select.eachPage(function (records, next) {
 
-				records.forEach(function(record) {
-					eachCallback(record)
-			    })
+				replaceIncludes(records, self.includes).then(function () {
 
-			    next()
+					records.forEach(function(record) {
+						eachCallback(record)
+				    })
+
+				    next()
+
+				}, function (error) {
+					reject(error)
+				})
 
 			}, function (error) {
 
