@@ -1,26 +1,26 @@
 {
-  "name": "airtable-filter",
-  "version": "0.0.2",
-  "description": "A programatic interface for writing Airtable filter functions.",
-  "main": "filter.js",
+  "name": "airtable-query",
+  "version": "0.0.1",
+  "description": "An easy and intuitive interface for creating queries on your Airtable bases",
+  "main": "index.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jgaull/airtable-filter.git"
+    "url": "git+https://github.com/jgaull/airtable-query.git"
   },
   "author": "Jonathan Gaull <jon@bikepretty.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jgaull/airtable-filter/issues"
+    "url": "https://github.com/jgaull/airtable-query/issues"
   },
-  "homepage": "https://github.com/jgaull/airtable-filter#readme",
+  "homepage": "https://github.com/jgaull/airtable-query#readme",
   "dependencies": {
     "airtable": "~0.5.0",
     "array-unique": "^0.3.2",
-    "moment": "^2.18.1",
-    "promise": "^7.1.1"
+    "promise": "^7.1.1",
+    "underscore": ">=1.1.7"
   },
   "devDependencies": {
     "mocha": "^3.3.0"
