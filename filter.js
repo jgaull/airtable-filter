@@ -24,6 +24,7 @@ Filter.prototype.where = function (key) {
 
 Filter.prototype.firstPage = function(params) {
 
+	var self = this
 	return this.select(params).then(function (select) {
 
 		return new Promise(function (resolve, reject) {
@@ -37,6 +38,8 @@ Filter.prototype.firstPage = function(params) {
 				resolve(records)
 			})
 		})
+	}).then(function (records) {
+		return replaceIncludes(records, self.includes)
 	})
 }
 
