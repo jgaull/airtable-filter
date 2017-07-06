@@ -43,6 +43,24 @@ Filter.prototype.firstPage = function(params) {
 	})
 }
 
+Filter.prototype.first = function (params) {
+
+	if (!params) {
+		params = {}
+	}
+
+	params.maxRecords = 1
+	
+	return this.all(params).then(function (records) {
+
+		if (records.length > 0) {
+			return records[0]
+		}
+
+		return null
+	})
+}
+
 Filter.prototype.all = function(params) {
 
 	var self = this

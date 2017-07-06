@@ -649,6 +649,31 @@ describe('Filter', function () {
 			done(error)
 		})
 	})
+
+	it.only('supports first', function (done) {
+
+		var date = moment.utc('5-7-2017', 'M-D-YYYY')
+
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.where('Birthday').exists().isSame(date, 'year')
+		pokemon.first().then(function (record) {
+
+			try {
+				assert(record)
+				assert.equal(typeof record, 'object')
+				assert(record.id)
+				assert.equal(typeof record.get, 'function')
+			}
+			catch (e) {
+				done(e)
+			}
+
+			done()
+			
+		}, function (error) {
+			done(error)
+		})
+	})
 })
 
 
