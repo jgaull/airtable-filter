@@ -1,6 +1,5 @@
 
 var unique = require('array-unique')
-var _ = require('underscore')
 var promise = require('promise')
 var moment = require('moment')
 
@@ -94,19 +93,20 @@ Operation.prototype.isContainedIn = function(array) {
 	var uniqueArray = unique(array)
 
 	var operations = []
-	_.each(uniqueArray, function (value) {
+	for(var i = 0; i < uniqueArray.length; i++) {
+		var value = uniqueArray[i]
 		value = sanitizeValue(value)
 		operations.push(logic.equal(key, value))
-	})
+	}
 
 	return this.addCondition(logic.or(operations))
 }
 
 Operation.prototype.matchesFilter = function (filter) {
-	return this.matchesKeyInFilter('RECORD_ID()', filter)
+	return this.matchesFieldInFilter('RECORD_ID()', filter)
 }
 
-Operation.prototype.matchesKeyInFilter = function(queryKey, filter) {
+Operation.prototype.matchesFieldInFilter = function(queryKey, filter) {
 
 	key = this.key
 
@@ -129,9 +129,10 @@ Operation.prototype.matchesKeyInFilter = function(queryKey, filter) {
 
 				var vals = value
 				var operations = []
-				_.each(vals, function (val) {
+				for (var i = 0; i < vals.length; i++) {
+					var val = vals[i]
 					operations.push(logic.equal(key, val))
-				})
+				}
 
 				operation = logic.or(operations)
 			}

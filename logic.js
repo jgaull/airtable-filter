@@ -1,6 +1,5 @@
 
 var unique = require('array-unique')
-var _ = require('underscore')
 
 function and(args) {
 	return logical('AND', args)
@@ -61,9 +60,10 @@ function buildFunction(name, args) {
 		args = unique(args)
 
 		var string = ''
-		_.each(args, function (arg) {
+		for (var i = 0; i < args.length; i++) {
+			var arg = args[i]
 			string += arg + ","
-		})
+		}
 
 		args = string.substring(0, string.length - 1)
 	}
