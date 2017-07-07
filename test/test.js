@@ -650,7 +650,7 @@ describe('Filter', function () {
 		})
 	})
 
-	it.only('supports first', function (done) {
+	it('supports first', function (done) {
 
 		var date = moment.utc('5-7-2017', 'M-D-YYYY')
 
@@ -669,7 +669,7 @@ describe('Filter', function () {
 			}
 
 			done()
-			
+
 		}, function (error) {
 			done(error)
 		})
