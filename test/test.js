@@ -498,6 +498,122 @@ describe('Filter', function () {
 		})
 	})
 
+	it('supports include all', function (done) {
+
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.where('identifier').search('oRl')
+		pokemon.include('Abilities', table('Abilities'))
+		pokemon.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+				//console.log('records: ' + JSON.stringify(records))
+				var abilityIds = [143.17,143.47,143.82]
+
+				records.forEach(function (record) {
+					assert.equal(record.get('identifier'), 'snorlax')
+
+					var abilitites = record.get('Abilities')
+					for (var i = 0; i < abilitites.length; i++) {
+						var ability = abilitites[i]
+
+						assert.equal(typeof ability, 'object')
+						assert(ability.id)
+						assert.equal(ability.get('id'), abilityIds[i])
+					}
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+
+		}, function (error) {
+			done(error)
+		})
+	})
+
+	it('supports include firstPage', function (done) {
+
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.where('identifier').search('oRl')
+		pokemon.include('Abilities', table('Abilities'))
+		pokemon.firstPage().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+				//console.log('records: ' + JSON.stringify(records))
+				var abilityIds = [143.17,143.47,143.82]
+
+				records.forEach(function (record) {
+					assert.equal(record.get('identifier'), 'snorlax')
+
+					var abilitites = record.get('Abilities')
+					for (var i = 0; i < abilitites.length; i++) {
+						var ability = abilitites[i]
+
+						assert.equal(typeof ability, 'object')
+						assert(ability.id)
+						assert.equal(ability.get('id'), abilityIds[i])
+					}
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+
+		}, function (error) {
+			done(error)
+		})
+	})
+
+	it('supports include each', function (done) {
+
+		var records = []
+
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.where('identifier').search('oRl')
+		pokemon.include('Abilities', table('Abilities'))
+		pokemon.each(function (record) {
+			records.push(record)
+
+		}).then(function () {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+				//console.log('records: ' + JSON.stringify(records))
+				var abilityIds = [143.17,143.47,143.82]
+
+				records.forEach(function (record) {
+					assert.equal(record.get('identifier'), 'snorlax')
+
+					var abilitites = record.get('Abilities')
+					for (var i = 0; i < abilitites.length; i++) {
+						var ability = abilitites[i]
+
+						assert.equal(typeof ability, 'object')
+						assert(ability.id)
+						assert.equal(ability.get('id'), abilityIds[i])
+					}
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+
+		}, function (error) {
+			done(error)
+		})
+	})
+
 	it('supports each', function (done) {
 
 		var name = 'snorlax'
@@ -528,6 +644,31 @@ describe('Filter', function () {
 			catch (e) {
 				done(e)
 			}
+
+		}, function (error) {
+			done(error)
+		})
+	})
+
+	it('supports first', function (done) {
+
+		var date = moment.utc('5-7-2017', 'M-D-YYYY')
+
+		var pokemon = new Filter(table('Pokemon'))
+		pokemon.where('Birthday').exists().isSame(date, 'year')
+		pokemon.first().then(function (record) {
+
+			try {
+				assert(record)
+				assert.equal(typeof record, 'object')
+				assert(record.id)
+				assert.equal(typeof record.get, 'function')
+			}
+			catch (e) {
+				done(e)
+			}
+
+			done()
 
 		}, function (error) {
 			done(error)
