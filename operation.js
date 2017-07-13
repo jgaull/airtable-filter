@@ -79,6 +79,11 @@ Operation.prototype.search = function (string) {
 	return this.addCondition(logic.buildFunction('SEARCH', [logic.buildFunction('LOWER', string), logic.buildFunction('LOWER', this.key)]))
 }
 
+Operation.prototype.contains = function (value) {
+	value = sanitizeValue(value)
+	return this.addCondition(logic.buildFunction('FIND', [value, logic.buildFunction('ARRAYJOIN', [this.key, '", "'])]))
+}
+
 Operation.prototype.isContainedIn = function(array) {
 	//console.log('typeof key: ' + typeof key + ', key.length: ' + key.length + ', isRecordId(): ' + isRecordId(key[0]))
 	var key = this.key

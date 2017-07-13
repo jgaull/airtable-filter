@@ -1,6 +1,6 @@
 {
   "name": "airtable-filter",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A programatic interface for writing Airtable filter functions.",
   "main": "filter.js",
   "scripts": {

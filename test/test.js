@@ -60,6 +60,28 @@ describe('Filter', function () {
 		})
 	})
 
+	it('supports contains', function (done) {
+
+		var filterPokemon = new Filter(table('Pokemon'))
+		filterPokemon.where('Notes').contains('favorite')
+		filterPokemon.all().then(function (records) {
+
+			try {
+				assert(records)
+				assert.equal(records.length, 1)
+
+				records.forEach(function (record) {
+					assert.equal(record.get('identifier'), 'snorlax')
+				})
+
+				done()
+			}
+			catch (e) {
+				done(e)
+			}
+		})
+	})
+
 	it('supports equalTo', function (done) {
 
 		var name = 'snorlax'
