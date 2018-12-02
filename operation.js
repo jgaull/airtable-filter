@@ -200,8 +200,7 @@ function isRecordId(value) {
 }
 
 function isFunction(value) {
-	//this should be a regex
-	return typeof value == 'string' && value.length > 0 && value[value.length - 1] == ')'
+	return value.match(/^[A-Z_]+\([\s\S]+\)$/g) !== null
 }
 
 function sanitizeKey(key) {
